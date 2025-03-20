@@ -46,7 +46,7 @@ export default function PetForm({ pet, onSuccess }: PetFormProps) {
       gender: pet.gender || "",
       weight: pet.weight || undefined,
       description: pet.description || "",
-      healthInfo: pet.healthInfo ? (typeof pet.healthInfo === 'string' ? JSON.parse(pet.healthInfo) : pet.healthInfo) : {
+      healthInfo: pet.healthInfo ? JSON.parse(pet.healthInfo as unknown as string) : {
         vaccinated: false,
         neutered: false,
         microchipped: false,

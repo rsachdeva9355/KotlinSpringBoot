@@ -37,11 +37,11 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <span className={`font-poppins font-medium cursor-pointer ${
+                <a className={`font-poppins font-medium ${
                   location === item.href ? "text-primary" : "text-gray-600 hover:text-primary"
                 }`}>
                   {item.label}
-                </span>
+                </a>
               </Link>
             ))}
           </nav>
@@ -97,25 +97,25 @@ export default function Header() {
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
-                  <span 
-                    className={`font-poppins py-2 block cursor-pointer ${
+                  <a 
+                    className={`font-poppins py-2 ${
                       location === item.href ? "text-primary" : "text-gray-600"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
-                  </span>
+                  </a>
                 </Link>
               ))}
               {user ? (
                 <>
                   <Link href="/profile">
-                    <span 
-                      className="font-poppins py-2 block cursor-pointer text-gray-600"
+                    <a 
+                      className="font-poppins py-2 text-gray-600"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Profile
-                    </span>
+                    </a>
                   </Link>
                   <Button 
                     variant="default" 
@@ -132,12 +132,12 @@ export default function Header() {
               ) : (
                 <>
                   <Link href="/auth">
-                    <span 
-                      className="font-poppins py-2 block cursor-pointer text-gray-600"
+                    <a 
+                      className="font-poppins py-2 text-gray-600"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign In
-                    </span>
+                    </a>
                   </Link>
                   <Link href="/auth">
                     <Button 
