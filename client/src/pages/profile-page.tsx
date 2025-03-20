@@ -37,7 +37,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Tabs tabs={tabs} defaultTab="profile" />
+      <CustomTabs tabs={tabs} defaultTab="profile" />
     </div>
   );
 }
