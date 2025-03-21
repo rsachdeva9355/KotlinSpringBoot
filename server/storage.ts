@@ -48,7 +48,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 
   constructor() {
     // Create session store connected to our database
@@ -384,6 +384,104 @@ export class DatabaseStorage implements IStorage {
       return info;
     } catch (error) {
       console.error("Error creating city information:", error);
+      throw error;
+    }
+  }
+
+  // Perplexity Service methods
+  async getPerplexityService(city: string, category: string): Promise<PerplexityService | undefined> {
+    try {
+      const [service] = await db.select().from(perplexityServices).where(
+        and(
+          eq(perplexityServices.city, city),
+          eq(perplexityServices.category, category)
+        )
+      );
+      return service;
+    } catch (error) {
+      console.error("Error fetching perplexity service:", error);
+      throw error;
+    }
+  }
+
+  async createPerplexityService(service: InsertPerplexityService): Promise<PerplexityService> {
+    try {
+      const [newService] = await db.insert(perplexityServices)
+        .values(service)
+        .returning();
+      return newService;
+    } catch (error) {
+      console.error("Error creating perplexity service:", error);
+      throw error;
+    }
+  }
+
+  async updatePerplexityService(city: string, category: string, content: string): Promise<PerplexityService | undefined> {
+    try {
+      const [updatedService] = await db.update(perplexityServices)
+        .set({ 
+          content,
+          timestamp: new Date()
+        })
+        .where(
+          and(
+            eq(perplexityServices.city, city),
+            eq(perplexityServices.category, category)
+          )
+        )
+        .returning();
+      return updatedService;
+    } catch (error) {
+      console.error("Error updating perplexity service:", error);
+      throw error;
+    }
+  }
+
+  // Perplexity Pet Care methods
+  async getPerplexityPetCare(topic: string, city: string): Promise<PerplexityPetCare | undefined> {
+    try {
+      const [petCare] = await db.select().from(perplexityPetCare).where(
+        and(
+          eq(perplexityPetCare.topic, topic),
+          eq(perplexityPetCare.city, city)
+        )
+      );
+      return petCare;
+    } catch (error) {
+      console.error("Error fetching perplexity pet care:", error);
+      throw error;
+    }
+  }
+
+  async createPerplexityPetCare(petCare: InsertPerplexityPetCare): Promise<PerplexityPetCare> {
+    try {
+      const [newPetCare] = await db.insert(perplexityPetCare)
+        .values(petCare)
+        .returning();
+      return newPetCare;
+    } catch (error) {
+      console.error("Error creating perplexity pet care:", error);
+      throw error;
+    }
+  }
+
+  async updatePerplexityPetCare(topic: string, city: string, content: string): Promise<PerplexityPetCare | undefined> {
+    try {
+      const [updatedPetCare] = await db.update(perplexityPetCare)
+        .set({ 
+          content,
+          timestamp: new Date()
+        })
+        .where(
+          and(
+            eq(perplexityPetCare.topic, topic),
+            eq(perplexityPetCare.city, city)
+          )
+        )
+        .returning();
+      return updatedPetCare;
+    } catch (error) {
+      console.error("Error updating perplexity pet care:", error);
       throw error;
     }
   }
