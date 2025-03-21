@@ -72,6 +72,7 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
 export const cityInformation = pgTable("city_information", {
   id: serial("id").primaryKey(),
   city: text("city").notNull(),
+  country: text("country").notNull(),
   category: text("category").notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
