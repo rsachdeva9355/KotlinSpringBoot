@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, pets, type Pet, type InsertPet, serviceProviders, type ServiceProvider, type InsertServiceProvider, cityInformation, type CityInfo, type InsertCityInfo } from "@shared/schema";
+import { users, type User, type InsertUser, pets, type Pet, type InsertPet, serviceProviders, type ServiceProvider, type InsertServiceProvider, cityInformation, type CityInfo, type InsertCityInfo, perplexityServices, type PerplexityService, type InsertPerplexityService, perplexityPetCare, type PerplexityPetCare, type InsertPerplexityPetCare } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, SQL } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
@@ -33,9 +33,18 @@ export interface IStorage {
   getCityInfo(id: number): Promise<CityInfo | undefined>;
   getCityInfoByCity(city: string, category?: string): Promise<CityInfo[]>;
   createCityInfo(info: InsertCityInfo): Promise<CityInfo>;
+  
+  // Perplexity API data methods
+  getPerplexityService(city: string, category: string): Promise<PerplexityService | undefined>;
+  createPerplexityService(service: InsertPerplexityService): Promise<PerplexityService>;
+  updatePerplexityService(city: string, category: string, content: string): Promise<PerplexityService | undefined>;
+  
+  getPerplexityPetCare(topic: string, city: string): Promise<PerplexityPetCare | undefined>;
+  createPerplexityPetCare(petCare: InsertPerplexityPetCare): Promise<PerplexityPetCare>;
+  updatePerplexityPetCare(topic: string, city: string, content: string): Promise<PerplexityPetCare | undefined>;
 
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 }
 
 export class DatabaseStorage implements IStorage {
