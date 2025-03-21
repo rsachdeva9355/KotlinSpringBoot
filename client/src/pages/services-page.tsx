@@ -4,6 +4,7 @@ import { useLocation, useSearch } from "wouter";
 import { ServiceProvider } from "@shared/schema";
 import ServiceCard from "@/components/services/service-card";
 import ServiceSearch from "@/components/services/service-search";
+import PerplexityServiceResults from "@/components/services/perplexity-service-results";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, List, Map as MapIcon } from "lucide-react";
@@ -57,6 +58,9 @@ export default function ServicesPage() {
       </div>
 
       <ServiceSearch initialCity={city} initialCategory={category} onSearch={handleSearch} />
+
+      {/* Add Perplexity Real-time Service Results */}
+      <PerplexityServiceResults city={city} category={category !== "all" ? category : undefined} />
 
       {isLoading ? (
         <div className="flex justify-center my-12">

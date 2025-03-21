@@ -26,9 +26,9 @@ export default function Footer() {
           <div>
             <h4 className="font-poppins font-semibold mb-4">Cities</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/services?city=Amsterdam"><a className="hover:text-white">Amsterdam</a></Link></li>
-              <li><Link href="/services?city=Dublin"><a className="hover:text-white">Dublin</a></Link></li>
-              <li><Link href="/services?city=Calgary"><a className="hover:text-white">Calgary</a></Link></li>
+              <li><Link href="/services?city=Amsterdam"><span className="hover:text-white cursor-pointer">Amsterdam</span></Link></li>
+              <li><Link href="/services?city=Dublin"><span className="hover:text-white cursor-pointer">Dublin</span></Link></li>
+              <li><Link href="/services?city=Calgary"><span className="hover:text-white cursor-pointer">Calgary</span></Link></li>
             </ul>
           </div>
           
