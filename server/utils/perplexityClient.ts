@@ -12,17 +12,19 @@ interface PerplexityResponse {
     };
     finish_reason: string;
   }[];
+  citations?: string[];
 }
 
 export class PerplexityClient {
   private apiKey: string;
   private baseUrl: string = 'https://api.perplexity.ai/chat/completions';
-  
+
   constructor() {
-    this.apiKey = process.env.PERPLEXITY_API_KEY as string;
-    if (!this.apiKey) {
+    const apiKey = process.env.PERPLEXITY_API_KEY;
+    if (!apiKey) {
       throw new Error('PERPLEXITY_API_KEY environment variable is not set');
     }
+    this.apiKey = apiKey;
   }
 
   /**
@@ -35,19 +37,20 @@ export class PerplexityClient {
       const response = await axios.post<PerplexityResponse>(
         this.baseUrl,
         {
-          model: 'sonar-small-online',
+          model: "llama-3.1-sonar-small-128k-online",
           messages: [
             {
-              role: 'system',
-              content: 'You are a helpful assistant providing factual information about pet services and pet care.'
+              role: "system",
+              content: "You are a helpful and concise pet care expert assistant."
             },
             {
-              role: 'user',
+              role: "user",
               content: prompt
             }
           ],
-          temperature: 0.1, // Lower temperature for more factual responses
-          max_tokens: 1000
+          temperature: 0.2,
+          max_tokens: 1000,
+          stream: false
         },
         {
           headers: {
@@ -56,15 +59,10 @@ export class PerplexityClient {
           }
         }
       );
-
-      const result = response.data.choices[0]?.message.content;
-      return result || 'No response from the model';
+      
+      return response.data.choices[0].message.content;
     } catch (error: any) {
-      console.error('Error querying Perplexity API:', error.message);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-      }
+      console.error('Error querying Perplexity API:', error.response?.data || error.message);
       throw new Error(`Failed to query Perplexity API: ${error.message}`);
     }
   }
@@ -76,52 +74,35 @@ export class PerplexityClient {
    * @returns Structured information about pet services in the city
    */
   async getPetServicesForCity(city: string, category?: string): Promise<any> {
-    const categoryStr = category ? ` focusing on ${category} services` : '';
-    const prompt = `Please provide factual information about pet services in ${city}${categoryStr}. 
-    Include the following details for each service:
-    - Name of the service provider
-    - Address
-    - Type of service (vet, groomer, pet store, boarding, etc.)
-    - Brief description
-    - Contact information (phone, website if available)
+    let prompt = `Please provide a comprehensive list of pet services in ${city}`;
     
-    Format the response as valid JSON that could be directly parsed, with an array of service providers.
-    Use this structure:
-    {
-      "services": [
-        {
-          "name": "Service Name",
-          "address": "Full address",
-          "city": "${city}",
-          "category": "Type of service",
-          "description": "Brief description",
-          "phone": "Phone number",
-          "website": "Website URL if available"
-        }
-      ]
-    }`;
+    if (category) {
+      prompt += ` specifically focused on ${category} services`;
+    }
+    
+    prompt += `. For each service, include the name, address, contact information, website (if available), 
+    hours of operation, types of animals served, and a brief description of services offered. 
+    Format the information clearly and concisely. Please ensure all information is accurate and up-to-date.`;
 
+    const response = await this.query(prompt);
+    
     try {
-      const response = await this.query(prompt);
-      
-      // Extract the JSON part from the response
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
-                        response.match(/{[\s\S]*?}/);
-      
-      if (jsonMatch) {
-        const jsonStr = jsonMatch[1] || jsonMatch[0];
-        return JSON.parse(jsonStr);
-      }
-      
-      // If no JSON format is detected, try to parse the entire response
-      try {
-        return JSON.parse(response);
-      } catch (e) {
-        throw new Error('Could not parse response as JSON');
-      }
-    } catch (error: any) {
-      console.error('Error getting pet services:', error.message);
-      throw error;
+      // Attempt to parse structured data from the response
+      // This is a simplistic approach - in a production environment you'd want more robust parsing
+      return {
+        city,
+        category: category || 'all',
+        content: response,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error parsing Perplexity response:', error);
+      return {
+        city,
+        category: category || 'all',
+        content: response,
+        timestamp: new Date().toISOString()
+      };
     }
   }
 
@@ -132,46 +113,25 @@ export class PerplexityClient {
    * @returns Information about the requested pet care topic
    */
   async getPetCareInformation(topic: string, city?: string): Promise<any> {
-    const locationStr = city ? ` in ${city}` : '';
-    const prompt = `Please provide factual information about ${topic} for pets${locationStr}.
-    Format the response as valid JSON that could be directly parsed, with an array of information articles.
-    Use this structure:
-    {
-      "articles": [
-        {
-          "title": "Article title",
-          "content": "Detailed content",
-          "category": "${topic}",
-          "city": "${city || 'General'}",
-          "source": "Source of information if available"
-        }
-      ]
-    }`;
-
-    try {
-      const response = await this.query(prompt);
-      
-      // Extract the JSON part from the response
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/) || 
-                        response.match(/{[\s\S]*?}/);
-      
-      if (jsonMatch) {
-        const jsonStr = jsonMatch[1] || jsonMatch[0];
-        return JSON.parse(jsonStr);
-      }
-      
-      // If no JSON format is detected, try to parse the entire response
-      try {
-        return JSON.parse(response);
-      } catch (e) {
-        throw new Error('Could not parse response as JSON');
-      }
-    } catch (error: any) {
-      console.error('Error getting pet care information:', error.message);
-      throw error;
+    let prompt = `Please provide detailed information about ${topic} for pet owners`;
+    
+    if (city) {
+      prompt += ` in ${city}`;
     }
+    
+    prompt += `. Include practical advice, best practices, common concerns, and any location-specific 
+    considerations. If there are multiple perspectives or approaches, please present them fairly. 
+    If there are relevant resources or services pet owners should know about, please mention those as well.`;
+
+    const response = await this.query(prompt);
+    
+    return {
+      topic,
+      city: city || 'general',
+      content: response,
+      timestamp: new Date().toISOString()
+    };
   }
 }
 
-// Export a singleton instance
 export const perplexityClient = new PerplexityClient();

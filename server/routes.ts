@@ -4,10 +4,14 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertPetSchema, insertUserSchema } from "@shared/schema";
+import perplexityRoutes from "./routes/perplexity";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
+  
+  // Perplexity API routes
+  app.use('/api/perplexity', perplexityRoutes);
 
   // User profile routes
   app.put("/api/user", async (req, res) => {
