@@ -9,6 +9,7 @@ import ProfilePage from "@/pages/profile-page";
 import PetProfilesPage from "@/pages/pet-profiles-page";
 import ServicesPage from "@/pages/services-page";
 import InfoHubPage from "@/pages/info-hub-page";
+import BreedGuidesPage from "@/pages/breed-guides-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "./hooks/use-auth";
 import Header from "./components/layout/header";
@@ -35,6 +36,9 @@ function Router() {
           </Route>
           <Route path="/info">
             <ProtectedRoute path="/info" component={InfoHubPage} />
+          </Route>
+          <Route path="/info/breeds">
+            <ProtectedRoute path="/info/breeds" component={BreedGuidesPage} />
           </Route>
           <Route component={NotFound} />
         </Switch>
