@@ -72,6 +72,7 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
 export const cityInformation = pgTable("city_information", {
   id: serial("id").primaryKey(),
   city: text("city").notNull(),
+  country: text("country").notNull(),
   category: text("category").notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
@@ -83,6 +84,52 @@ export const cityInformation = pgTable("city_information", {
 export const insertCityInfoSchema = createInsertSchema(cityInformation).omit({
   id: true,
   updatedAt: true
+});
+
+// Perplexity Service Results schema
+export const perplexityServices = pgTable("perplexity_services", {
+  id: serial("id").primaryKey(),
+  city: text("city").notNull(),
+  category: text("category").notNull(),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+  // Creating a unique constraint on city+category for faster lookups
+  // and to prevent duplicate entries
+}, (table) => {
+  return {
+    cityCategory: {
+      name: "perplexity_services_city_category_unique",
+      columns: [table.city, table.category]  
+    }
+  }
+});
+
+export const insertPerplexityServiceSchema = createInsertSchema(perplexityServices).omit({
+  id: true,
+  timestamp: true
+});
+
+// Perplexity Pet Care Information schema
+export const perplexityPetCare = pgTable("perplexity_pet_care", {
+  id: serial("id").primaryKey(),
+  topic: text("topic").notNull(),
+  city: text("city").notNull(),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+  // Creating a unique constraint on topic+city for faster lookups
+  // and to prevent duplicate entries
+}, (table) => {
+  return {
+    topicCity: {
+      name: "perplexity_pet_care_topic_city_unique",
+      columns: [table.topic, table.city]  
+    }
+  }
+});
+
+export const insertPerplexityPetCareSchema = createInsertSchema(perplexityPetCare).omit({
+  id: true,
+  timestamp: true
 });
 
 // Type exports
@@ -97,6 +144,12 @@ export type InsertServiceProvider = z.infer<typeof insertServiceProviderSchema>;
 
 export type CityInfo = typeof cityInformation.$inferSelect;
 export type InsertCityInfo = z.infer<typeof insertCityInfoSchema>;
+
+export type PerplexityService = typeof perplexityServices.$inferSelect;
+export type InsertPerplexityService = z.infer<typeof insertPerplexityServiceSchema>;
+
+export type PerplexityPetCare = typeof perplexityPetCare.$inferSelect;
+export type InsertPerplexityPetCare = z.infer<typeof insertPerplexityPetCareSchema>;
 
 export type PetEventType = 
   | 'vet'
