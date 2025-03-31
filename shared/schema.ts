@@ -150,3 +150,80 @@ export type InsertPerplexityService = z.infer<typeof insertPerplexityServiceSche
 
 export type PerplexityPetCare = typeof perplexityPetCare.$inferSelect;
 export type InsertPerplexityPetCare = z.infer<typeof insertPerplexityPetCareSchema>;
+
+export type PetEventType = 
+  | 'vet'
+  | 'grooming'
+  | 'medication'
+  | 'vaccination'
+  | 'training'
+  | 'exercise'
+  | 'feeding'
+  | 'other';
+
+export interface PetEvent {
+  id: string;
+  petId: string;
+  type: PetEventType;
+  title: string;
+  description?: string;
+  startDate: string;
+  endDate?: string;
+  isAllDay: boolean;
+  recurring?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    interval: number;
+    endDate?: string;
+  };
+  reminder?: {
+    enabled: boolean;
+    timing: number; // minutes before event
+    type: 'push' | 'email' | 'both';
+  };
+  color?: string;
+  completed?: boolean;
+  notes?: string;
+}
+
+export const EVENT_TYPE_CONFIG: Record<PetEventType, { label: string; color: string; icon: string }> = {
+  vet: { 
+    label: 'Veterinary',
+    color: '#ef4444', // red
+    icon: 'stethoscope'
+  },
+  grooming: {
+    label: 'Grooming',
+    color: '#8b5cf6', // purple
+    icon: 'scissors'
+  },
+  medication: {
+    label: 'Medication',
+    color: '#3b82f6', // blue
+    icon: 'pill'
+  },
+  vaccination: {
+    label: 'Vaccination',
+    color: '#10b981', // green
+    icon: 'syringe'
+  },
+  training: {
+    label: 'Training',
+    color: '#f59e0b', // amber
+    icon: 'target'
+  },
+  exercise: {
+    label: 'Exercise',
+    color: '#ec4899', // pink
+    icon: 'activity'
+  },
+  feeding: {
+    label: 'Feeding',
+    color: '#6366f1', // indigo
+    icon: 'bowl'
+  },
+  other: {
+    label: 'Other',
+    color: '#64748b', // slate
+    icon: 'more-horizontal'
+  }
+};

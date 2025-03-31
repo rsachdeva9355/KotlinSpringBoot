@@ -3,96 +3,131 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, MapPin, Heart, Info } from "lucide-react";
+import { 
+  PawPrint, 
+  MapPin, 
+  Calendar, 
+  GraduationCap, 
+  Users, 
+  Heart,
+  ChevronRight,
+  Check
+} from "lucide-react";
 
 export default function HomePage() {
   const { user } = useAuth();
   const [_, setLocation] = useLocation();
 
   useEffect(() => {
-    // Redirect to profile page if user is logged in
+    // Redirect to dashboard if user is logged in
     if (user) {
-      setLocation("/profile");
+      setLocation("/dashboard");
     }
   }, [user, setLocation]);
 
   const features = [
     {
-      title: "Create Pet Profiles",
-      description: "Build detailed profiles for all your pets with photos, health information, and more.",
-      icon: <Heart className="h-8 w-8 text-primary" />,
+      title: "Pet Profiles",
+      description: "Create detailed profiles for your pets with health records, care schedules, and more.",
+      icon: <PawPrint className="h-8 w-8 text-primary" />,
       action: () => setLocation("/pets")
     },
     {
-      title: "Find Local Pet Services",
-      description: "Discover veterinarians, groomers, pet shops, and more in your city.",
-      icon: <MapPin className="h-8 w-8 text-secondary" />,
-      action: () => setLocation("/services")
+      title: "Care Calendar",
+      description: "Track vet visits, grooming appointments, medications, and other important pet care events.",
+      icon: <Calendar className="h-8 w-8 text-secondary" />,
+      action: () => setLocation("/calendar")
     },
     {
-      title: "City-Specific Pet Info",
-      description: "Get regulations, resources, and pet-friendly locations specific to your city.",
-      icon: <Info className="h-8 w-8 text-accent-dark" />,
-      action: () => setLocation("/info")
+      title: "Educational Hub",
+      description: "Access comprehensive guides on pet care, training resources, and expert advice.",
+      icon: <GraduationCap className="h-8 w-8 text-accent-dark" />,
+      action: () => setLocation("/education")
+    }
+  ];
+
+  const benefits = [
+    {
+      title: "Community Connection",
+      description: "Connect with other pet owners, share experiences, and get advice.",
+      icon: <Users className="h-6 w-6 text-primary" />
+    },
+    {
+      title: "Service Directory",
+      description: "Find trusted veterinarians, groomers, trainers, and other pet services.",
+      icon: <MapPin className="h-6 w-6 text-secondary" />
+    },
+    {
+      title: "Health Tracking",
+      description: "Monitor your pet's health metrics, medications, and wellness over time.",
+      icon: <Heart className="h-6 w-6 text-accent-dark" />
     }
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="font-poppins text-4xl md:text-5xl font-bold mb-6">
-            Connect, Discover, Care with <span className="text-primary">Pet</span><span className="text-secondary">Pals</span>
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
-            The complete platform for pet owners in Amsterdam, Dublin, and Calgary to manage pets, 
-            find local services, and access city-specific pet information.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button 
-              size="lg" 
-              className="font-poppins font-medium"
-              onClick={() => setLocation("/profile")}
-            >
-              Get Started
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="font-poppins font-medium"
-              onClick={() => setLocation("/services")}
-            >
-              Explore Services
-            </Button>
+      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Your Complete Pet Care Companion
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
+              Manage your pet's health, schedule care activities, and access expert resources
+              all in one place. Join our community of pet lovers today!
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="font-medium"
+                onClick={() => setLocation("/register")}
+              >
+                Get Started
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="font-medium"
+                onClick={() => setLocation("/about")}
+              >
+                Learn More
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <h2 className="font-poppins text-3xl font-semibold text-center mb-12">
-            Everything You Need For Your Pets
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">
+              Everything You Need For Your Pet
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Comprehensive tools and features designed to make pet care easier and more organized.
+            </p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center text-center">
-                    <div className="mb-4 p-3 bg-gray-50 rounded-full">
+                    <div className="mb-4 p-3 bg-primary/10 rounded-full">
                       {feature.icon}
                     </div>
-                    <h3 className="font-poppins text-xl font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 mb-6">{feature.description}</p>
+                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-muted-foreground mb-6">{feature.description}</p>
                     <Button 
                       variant="ghost" 
                       className="text-primary"
                       onClick={feature.action}
                     >
                       Learn More
+                      <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -102,44 +137,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Cities Section */}
-      <section className="bg-white py-16">
+      {/* Benefits Section */}
+      <section className="py-20 bg-secondary/10">
         <div className="container mx-auto px-4">
-          <h2 className="font-poppins text-3xl font-semibold text-center mb-4">
-            Serving These Cities
-          </h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-12">
-            PetPals is currently available in these cities with local services and city-specific pet information.
-          </p>
-          
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">
+              Why Choose PawConnect?
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of pet owners who trust PawConnect for their pet care needs.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {["Amsterdam", "Dublin", "Calgary"].map((city, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-6 text-center">
-                <h3 className="font-poppins text-xl font-semibold mb-4">{city}</h3>
-                <ul className="space-y-2 text-gray-600 mb-6">
-                  <li className="flex items-center justify-center">
-                    <Check size={18} className="text-green-500 mr-2" />
-                    <span>Local Pet Services</span>
-                  </li>
-                  <li className="flex items-center justify-center">
-                    <Check size={18} className="text-green-500 mr-2" />
-                    <span>City Pet Regulations</span>
-                  </li>
-                  <li className="flex items-center justify-center">
-                    <Check size={18} className="text-green-500 mr-2" />
-                    <span>Pet-Friendly Locations</span>
-                  </li>
-                </ul>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setLocation(`/services?city=${city}`)}
-                >
-                  Explore {city}
-                </Button>
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex flex-col items-center text-center">
+                <div className="mb-4 p-3 bg-background rounded-full shadow-sm">
+                  {benefit.icon}
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
+                <p className="text-muted-foreground">{benefit.description}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-6">
+            Ready to Give Your Pet the Best Care?
+          </h2>
+          <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
+            Join PawConnect today and experience a better way to manage your pet's care needs.
+          </p>
+          <Button 
+            size="lg" 
+            variant="secondary"
+            className="font-medium"
+            onClick={() => setLocation("/register")}
+          >
+            Get Started Now
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </section>
     </div>
