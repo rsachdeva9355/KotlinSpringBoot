@@ -1,13 +1,29 @@
 import { apiRequest } from "./queryClient";
 
-interface PerplexityServiceResponse {
+export interface ServiceProvider {
+  name: string;
+  category: string;
+  address: string;
+  phone?: string;
+  website?: string;
+  openingHours?: string;
+  rating?: number;
+  reviewCount?: number;
+  imageUrl?: string;
+  description?: string;
+  animals: string[];
+}
+
+export interface PerplexityServiceResponse {
   city: string;
   category: string;
-  content: string;
+  content: {
+    services: ServiceProvider[];
+  };
   timestamp: string;
 }
 
-interface PerplexityInfoResponse {
+export interface PerplexityInfoResponse {
   topic: string;
   city: string;
   content: string;

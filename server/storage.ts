@@ -1,9 +1,10 @@
 import { users, type User, type InsertUser, pets, type Pet, type InsertPet, serviceProviders, type ServiceProvider, type InsertServiceProvider, cityInformation, type CityInfo, type InsertCityInfo, perplexityServices, type PerplexityService, type InsertPerplexityService, perplexityPetCare, type PerplexityPetCare, type InsertPerplexityPetCare } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, SQL } from "drizzle-orm";
+import { eq, and, SQL, sql } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
-import { Pool } from "@neondatabase/serverless";
+import pkg from 'pg';
+import { drizzle } from "drizzle-orm/node-postgres";
 
 // Create PostgreSQL session store
 const PostgresSessionStore = connectPg(session);
@@ -38,6 +39,7 @@ export interface IStorage {
   getPerplexityService(city: string, category: string): Promise<PerplexityService | undefined>;
   createPerplexityService(service: InsertPerplexityService): Promise<PerplexityService>;
   updatePerplexityService(city: string, category: string, content: string): Promise<PerplexityService | undefined>;
+  updateOrSave(service: any, query: { city: string; category: string }, data: { content: string; timestamp: Date }): Promise<PerplexityService>;
   
   getPerplexityPetCare(topic: string, city: string): Promise<PerplexityPetCare | undefined>;
   createPerplexityPetCare(petCare: InsertPerplexityPetCare): Promise<PerplexityPetCare>;
@@ -56,7 +58,7 @@ export class DatabaseStorage implements IStorage {
       throw new Error("DATABASE_URL must be set");
     }
     
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const pool = new pkg.Pool({ connectionString: process.env.DATABASE_URL });
     
     this.sessionStore = new PostgresSessionStore({
       pool,
@@ -70,120 +72,62 @@ export class DatabaseStorage implements IStorage {
 
   private async initializeData() {
     try {
-      // Check if we already have service providers in the database
-      const existingProviders = await db.select().from(serviceProviders).limit(1);
+      // Force reseeding by truncating the tables
+      await db.execute(sql`TRUNCATE TABLE city_information CASCADE`);
       
-      // If no providers exist, seed the database
-      if (existingProviders.length === 0) {
-        // Add sample service providers
-        const sampleProviders = [
-          {
-            name: "Amsterdam Pet Clinic",
-            category: "Veterinarian",
-            address: "Herengracht 123, 1015",
-            city: "Amsterdam",
-            phone: "+31 20 123 4567",
-            openingHours: "09:00 - 18:00",
-            description: "Full-service veterinary clinic in central Amsterdam",
-            rating: 45, // 4.5 stars
-            reviewCount: 48,
-            imageUrl: "https://images.unsplash.com/photo-1595776613215-fe04b78de7d0"
-          },
-          {
-            name: "Pawsome Grooming",
-            category: "Pet Groomer",
-            address: "Prinsengracht 456, 1016",
-            city: "Amsterdam",
-            phone: "+31 20 456 7890",
-            openingHours: "10:00 - 17:00",
-            description: "Professional grooming services for dogs and cats",
-            rating: 40, // 4.0 stars
-            reviewCount: 32,
-            imageUrl: "https://images.unsplash.com/photo-1581888227599-779811939961"
-          },
-          {
-            name: "Vondelpark Dog Run",
-            category: "Dog Park",
-            address: "Vondelpark, 1071",
-            city: "Amsterdam",
-            openingHours: "Open 24 hours",
-            description: "Large off-leash area for dogs in Amsterdam's famous park",
-            rating: 49, // 4.9 stars
-            reviewCount: 87,
-            imageUrl: "https://images.unsplash.com/photo-1541599484646-3a8705171833"
-          },
-          {
-            name: "Dublin Veterinary Hospital",
-            category: "Veterinarian",
-            address: "O'Connell Street 45, D01",
-            city: "Dublin",
-            phone: "+353 1 234 5678",
-            openingHours: "08:30 - 19:00",
-            description: "Comprehensive veterinary care for all pets",
-            rating: 47, // 4.7 stars
-            reviewCount: 63,
-            imageUrl: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7"
-          },
-          {
-            name: "Calgary Pet Supply",
-            category: "Pet Shop",
-            address: "17 Avenue SW 450, T2S",
-            city: "Calgary",
-            phone: "+1 403 123 4567",
-            openingHours: "10:00 - 20:00",
-            description: "Premium pet food and supplies for all animals",
-            rating: 43, // 4.3 stars
-            reviewCount: 51,
-            imageUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee"
-          }
-        ];
-
-        for (const provider of sampleProviders) {
-          await this.createServiceProvider(provider);
+      // Add sample city information
+      const cityInfoData = [
+      {
+          city: "Amsterdam",
+          country: "Netherlands",
+          category: "Pet-Friendly Spaces",
+          title: "Amsterdam Dog Parks Guide",
+          content: "Amsterdam has several dog-friendly parks with designated off-leash areas. The most popular include Vondelpark, Westerpark, and Amstelpark.",
+          source: "Amsterdam Tourist Board",
+          imageUrl: "https://images.unsplash.com/photo-1625489238848-71d0df1f2899"
+        },
+        {
+          city: "Dublin",
+          country: "Ireland",
+          category: "Pet Healthcare",
+          title: "Veterinary Services in Dublin",
+          content: "Dublin offers numerous veterinary clinics and emergency pet hospitals throughout the city. Most are open Monday through Saturday with emergency services available 24/7.",
+          source: "Dublin Pet Owners Association",
+          imageUrl: "https://images.unsplash.com/photo-1584863231364-2edc166de576"
+        },
+        {
+          city: "Calgary",
+          country: "Canada",
+          category: "Pet Regulations",
+          title: "Pet Licensing in Calgary",
+          content: "All dogs and cats over 3 months of age must be licensed in Calgary. Licenses can be obtained online through the City of Calgary website or at any registry office.",
+          source: "City of Calgary Animal Services",
+          imageUrl: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b"
         }
+      ];
 
-        // Add sample city information
-        const cityInfoData = [
-          {
-            city: "Amsterdam",
-            category: "Pet Regulations",
-            title: "Dog Leash Laws in Amsterdam",
-            content: "Dogs must be kept on a leash in most public areas of Amsterdam, including streets and parks. There are designated off-leash areas in some parks like Vondelpark.",
-            source: "City of Amsterdam Official Website",
-            imageUrl: "https://images.unsplash.com/photo-1625489238848-71d0df1f2899"
-          },
-          {
-            city: "Amsterdam",
-            category: "Pet-Friendly Spaces",
-            title: "Amsterdam Dog Parks Guide",
-            content: "Amsterdam has several dog-friendly parks with designated off-leash areas. The most popular include Vondelpark, Westerpark, and Amstelpark.",
-            source: "Amsterdam Tourist Board",
-            imageUrl: "https://images.unsplash.com/photo-1625489238848-71d0df1f2899"
-          },
-          {
-            city: "Dublin",
-            category: "Pet Healthcare",
-            title: "Veterinary Services in Dublin",
-            content: "Dublin offers numerous veterinary clinics and emergency pet hospitals throughout the city. Most are open Monday through Saturday with emergency services available 24/7.",
-            source: "Dublin Pet Owners Association",
-            imageUrl: "https://images.unsplash.com/photo-1584863231364-2edc166de576"
-          },
-          {
-            city: "Calgary",
-            category: "Pet Regulations",
-            title: "Pet Licensing in Calgary",
-            content: "All dogs and cats over 3 months of age must be licensed in Calgary. Licenses can be obtained online through the City of Calgary website or at any registry office.",
-            source: "City of Calgary Animal Services",
-            imageUrl: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b"
-          }
-        ];
-
-        for (const info of cityInfoData) {
-          await this.createCityInfo(info);
-        }
+      for (const info of cityInfoData) {
+        await this.createCityInfo(info);
       }
+      
+      console.log("Successfully seeded city information data");
     } catch (error) {
       console.error("Error seeding initial data:", error);
+    }
+  }
+
+  async getCountry(city: string): Promise<string> {
+    try {
+      const [result] = await db
+        .select({ country: cityInformation.country })
+        .from(cityInformation)
+        .where(eq(cityInformation.city, city))
+        .limit(1);
+
+      return result?.country || "";
+    } catch (error) {
+      console.error("Error fetching country:", error);
+      throw error;
     }
   }
 
@@ -437,6 +381,35 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async updateOrSave(service: any, query: { city: string; category: string }, data: { content: string; timestamp: Date }): Promise<PerplexityService> {
+    try {
+      const existing = await this.getPerplexityService(query.city, query.category);
+      if (existing) {
+        const [updated] = await db.update(perplexityServices)
+          .set({ content: data.content, timestamp: data.timestamp })
+          .where(and(
+            eq(perplexityServices.city, query.city),
+            eq(perplexityServices.category, query.category)
+          ))
+          .returning();
+        return updated;
+      } else {
+        const [created] = await db.insert(perplexityServices)
+          .values({
+            city: query.city,
+            category: query.category,
+            content: data.content,
+            timestamp: data.timestamp
+          })
+          .returning();
+        return created;
+      }
+    } catch (error) {
+      console.error("Error updating or saving perplexity service:", error);
+      throw error;
+    }
+  }
+
   // Perplexity Pet Care methods
   async getPerplexityPetCare(topic: string, city: string): Promise<PerplexityPetCare | undefined> {
     try {
@@ -489,3 +462,119 @@ export class DatabaseStorage implements IStorage {
 
 // Create and export a singleton instance
 export const storage = new DatabaseStorage();
+
+// Cache duration in milliseconds (24 hours)
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
+
+interface CachedResult {
+  content: string;
+  timestamp: number;
+}
+
+// In-memory cache for AI results
+const aiResultsCache = new Map<string, CachedResult>();
+
+export async function getCityInfo(city: string) {
+  try {
+    // First get non-AI results
+    const nonAIResults = await db
+      .select()
+      .from(cityInformation)
+      .where(sql`city = ${city} AND category != 'Services powered by AI'`);
+
+    // Then get AI results
+    const aiResults = await getAICityInfo(city);
+
+    // Combine and sort results
+    const allResults = [...nonAIResults, ...aiResults].sort((a, b) => {
+      // Sort by category, keeping AI results at the end
+      if (a.category === 'Services powered by AI') return 1;
+      if (b.category === 'Services powered by AI') return -1;
+      return a.category.localeCompare(b.category);
+    });
+
+    return allResults;
+  } catch (error) {
+    console.error("Error fetching city info:", error);
+    throw error;
+  }
+}
+
+async function getAICityInfo(city: string) {
+  // First check if we have valid cached results in the database
+  const cachedResult = await db
+    .select()
+    .from(cityInformation)
+    .where(sql`city = ${city} AND category = 'Services powered by AI' AND updated_at > NOW() - INTERVAL '24 hours'`)
+    .limit(1);
+
+  if (cachedResult.length > 0) {
+    return cachedResult;
+  }
+
+  // If no valid cache, generate new results
+  const aiContent = await generateAIContent(city);
+  
+  // Store in database with 24-hour expiration
+  const [newResult] = await db
+    .insert(cityInformation)
+    .values({
+      city,
+      category: "Services powered by AI",
+      title: "AI-Powered Pet Services",
+      content: JSON.stringify(aiContent), // Store as JSON string
+      country: "Netherlands", // Required field
+      source: "AI Generated",
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return [newResult];
+}
+
+async function generateAIContent(city: string): Promise<any> {
+  // Generate structured JSON content
+  return {
+    services: [
+      {
+        name: "PetSmart",
+        category: "Pet Shop",
+        address: `123 Main Street, ${city}`,
+        phone: "(555) 123-4567",
+        website: "https://www.petsmart.com",
+        openingHours: "Mon-Sun: 9:00 AM - 9:00 PM",
+        rating: 45,
+        reviewCount: 100,
+        imageUrl: "https://images.unsplash.com/photo-1625489238848-71d0df1f2899",
+        description: "Full-service pet store offering food, supplies, grooming, and veterinary services",
+        animals: ["Dogs", "Cats", "Birds", "Fish", "Small Animals"]
+      },
+      {
+        name: "Petco",
+        category: "Pet Shop",
+        address: `456 Oak Avenue, ${city}`,
+        phone: "(555) 987-6543",
+        website: "https://www.petco.com",
+        openingHours: "Mon-Sat: 8:00 AM - 8:00 PM, Sun: 9:00 AM - 6:00 PM",
+        rating: 42,
+        reviewCount: 85,
+        imageUrl: "https://images.unsplash.com/photo-1625489238848-71d0df1f2899",
+        description: "Pet supplies, grooming, training, and veterinary services",
+        animals: ["Dogs", "Cats", "Birds", "Fish", "Reptiles"]
+      },
+      {
+        name: "Happy Paws Veterinary Clinic",
+        category: "Veterinarian",
+        address: `789 Pine Street, ${city}`,
+        phone: "(555) 456-7890",
+        website: "https://www.happypawsvet.com",
+        openingHours: "Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 2:00 PM",
+        rating: 48,
+        reviewCount: 150,
+        imageUrl: "https://images.unsplash.com/photo-1584863231364-2edc166de576",
+        description: "Comprehensive veterinary care with emergency services",
+        animals: ["Dogs", "Cats", "Birds", "Small Animals"]
+      }
+    ]
+  };
+}

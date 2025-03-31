@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { perplexityClient } from '../utils/perplexityClient';
+import { storage } from '../storage';
 
 const router = Router();
 
@@ -16,10 +17,11 @@ router.get('/services', async (req, res) => {
     return res.status(400).json({ error: 'City parameter is required' });
   }
 
+  const country = await storage.getCountry(city);
   try {
     const serviceData = await perplexityClient.getPetServicesForCity(
-      city, 
-      typeof category === 'string' ? category : undefined
+      city,
+      typeof category === 'string' ? category : ""
     );
     res.json(serviceData);
   } catch (error: any) {
@@ -45,9 +47,9 @@ router.get('/pet-care', async (req, res) => {
   }
 
   try {
-    const infoData = await perplexityClient.getPetCareInformation(
+    const infoData = await perplexityClient.getPetCareInfo(
       topic,
-      typeof city === 'string' ? city : undefined
+      typeof city === 'string' ? city : ""
     );
     res.json(infoData);
   } catch (error: any) {

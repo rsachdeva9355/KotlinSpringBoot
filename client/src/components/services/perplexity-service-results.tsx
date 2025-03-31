@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, AlertCircle } from "lucide-react";
-import { fetchPerplexityServices } from "@/lib/perplexityApi";
+import { Loader2, AlertCircle, MapPin, Globe, Clock, Phone, Dog, StarIcon, Bookmark } from "lucide-react";
+import { fetchPerplexityServices, type PerplexityServiceResponse, type ServiceProvider } from "@/lib/perplexityApi";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface PerplexityServiceResultsProps {
   city: string;
@@ -12,88 +13,123 @@ interface PerplexityServiceResultsProps {
 }
 
 export default function PerplexityServiceResults({ city, category }: PerplexityServiceResultsProps) {
-  const [showDefaultResults, setShowDefaultResults] = useState(false);
-
-  // When the category or city changes, reset to show perplexity results
-  useEffect(() => {
-    setShowDefaultResults(false);
-  }, [city, category]);
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: [`/api/perplexity/services`, city, category],
+  const { data, isLoading, error } = useQuery<PerplexityServiceResponse>({
+    queryKey: ["perplexityServices", city, category],
     queryFn: () => fetchPerplexityServices(city, category),
-    enabled: !showDefaultResults,
-    staleTime: 1000 * 60 * 10, // 10 minutes
   });
-
-  if (showDefaultResults) {
-    return null;
-  }
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-        <p className="text-gray-600">
-          Looking up real pet services in {city}
-          {category && category !== "all" ? ` for ${category}` : ""}...
-        </p>
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="destructive" className="mb-6">
+      <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          We couldn't fetch real service data at this time.
-          <Button 
-            variant="link" 
-            onClick={() => setShowDefaultResults(true)}
-            className="p-0 h-auto font-normal ml-2"
-          >
-            Show available services instead
-          </Button>
+          Failed to load AI-powered service results. Please try again later.
         </AlertDescription>
       </Alert>
     );
   }
 
-  if (!data) {
+  if (!data?.content?.services?.length) {
     return null;
   }
 
   return (
-    <div className="mb-8">
-      <Card>
-        <CardContent className="pt-6">
-          <div className="mb-4 flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-semibold mb-1">Services powered by AI</h3>
-              <p className="text-sm text-gray-500">Fetched in real-time from Perplexity API</p>
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {data.content.services.map((service: ServiceProvider, index: number) => (
+        <Card key={index} className="overflow-hidden">
+          {service.imageUrl && (
+            <div className="aspect-video relative">
+              <img
+                src={service.imageUrl}
+                alt={service.name}
+                className="object-cover w-full h-full"
+              />
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowDefaultResults(true)}
-            >
-              Show regular results
-            </Button>
-          </div>
+          )}
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-lg">{service.name}</h3>
+                <Badge variant="secondary" className="mt-1">
+                  {service.category}
+                </Badge>
+              </div>
+              <Button variant="ghost" size="icon">
+                <Bookmark className="h-4 w-4" />
+              </Button>
+            </div>
 
-          <div className="prose max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: data.content.replace(/\n/g, '<br />') }} />
-          </div>
+            {service.rating && (
+              <div className="flex items-center gap-1 mt-2">
+                <StarIcon className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm">
+                  {service.rating}/50 ({service.reviewCount} reviews)
+                </span>
+              </div>
+            )}
 
-          <div className="mt-4 text-right">
-            <p className="text-xs text-gray-400">
-              Last updated: {new Date(data.timestamp).toLocaleString()}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>{service.address}</span>
+              </div>
+              {service.phone && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="h-4 w-4" />
+                  <span>{service.phone}</span>
+                </div>
+              )}
+              {service.website && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Globe className="h-4 w-4" />
+                  <a
+                    href={service.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    Visit Website
+                  </a>
+                </div>
+              )}
+              {service.openingHours && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{service.openingHours}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Dog className="h-4 w-4" />
+                <span>{service.animals.join(", ")}</span>
+              </div>
+            </div>
+
+            {service.description && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                {service.description}
+              </p>
+            )}
+
+            <div className="mt-4 flex gap-2">
+              <Button variant="outline" className="flex-1">
+                View Details
+              </Button>
+              <Button className="flex-1">
+                Contact
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { db } from './server/db.js';
+import { db } from './server/db.ts';
 
 console.log('Starting database schema push...');
 

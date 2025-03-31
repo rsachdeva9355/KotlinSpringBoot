@@ -7,6 +7,20 @@ interface ServiceCardProps {
   service: ServiceProvider;
 }
 
+const DEFAULT_IMAGES = [
+  "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800&auto=format&fit=crop", // Happy dog
+  "https://images.unsplash.com/photo-1625489238848-71d0df1f2899?q=80&w=800&auto=format&fit=crop", // Dog park
+  "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?q=80&w=800&auto=format&fit=crop", // Cat and dog
+  "https://images.unsplash.com/photo-1450778869180-41d0601e046e?q=80&w=800&auto=format&fit=crop", // Pet grooming
+  "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?q=80&w=800&auto=format&fit=crop", // Pet shop
+  "https://images.unsplash.com/photo-1628009364945-f7d53e64b3cd?q=80&w=800&auto=format&fit=crop", // Pet toys
+];
+
+const getRandomDefaultImage = () => {
+  const randomIndex = Math.floor(Math.random() * DEFAULT_IMAGES.length);
+  return DEFAULT_IMAGES[randomIndex];
+};
+
 export default function ServiceCard({ service }: ServiceCardProps) {
   const {
     name,
@@ -60,14 +74,12 @@ export default function ServiceCard({ service }: ServiceCardProps) {
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer">
-      <div className="relative h-40 bg-gray-200">
-        {imageUrl ? (
-          <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
-            No image available
-          </div>
-        )}
+      <div className="aspect-video relative">
+        <img
+          src={imageUrl || getRandomDefaultImage()}
+          alt={name}
+          className="object-cover w-full h-full"
+        />
         <div className={`absolute top-0 left-0 px-2 py-1 rounded-br-md ${getCategoryColor(category)}`}>
           <span className="text-sm font-medium">{category}</span>
         </div>
