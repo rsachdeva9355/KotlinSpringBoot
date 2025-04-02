@@ -23,7 +23,7 @@ function Router() {
         <Switch>
           <Route path="/auth" component={AuthPage} />
           <Route path="/info" component={InfoHubPage} />
-          <Route path="/" component={InfoHubPage} />
+          <Route path="/" component={HomePage} />
           <Route path="/profile">
             <ProtectedRoute path="/profile" component={ProfilePage} />
           </Route>

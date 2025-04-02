@@ -14,7 +14,7 @@ export default function HomePage() {
   useEffect(() => {
     // Redirect to dashboard if user is logged in
     if (user) {
-      setLocation("/dashboard");
+      setLocation("/profile");
     }
   }, [user, setLocation]);
 

@@ -57,7 +57,7 @@ const CallToAction = () => {
             <Button 
               size="lg"
               className="w-full sm:w-auto px-8 py-3 text-base font-semibold" 
-              onClick={() => setLocation("/register")}
+              onClick={() => setLocation("/auth")}
             >
               Get Started Today
               <ChevronRight className="ml-2 h-4 w-4" />

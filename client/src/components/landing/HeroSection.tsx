@@ -104,7 +104,7 @@ const HeroSection = () => {
         >
           <Button 
             className="w-full sm:w-auto px-8 py-3 text-base font-semibold"
-            onClick={() => setLocation("/register")}
+            onClick={() => setLocation("/auth")}
           >
             Get Started
             <ChevronRight className="ml-2 h-4 w-4" />
