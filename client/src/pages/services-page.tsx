@@ -60,7 +60,7 @@ export default function ServicesPage() {
       <ServiceSearch initialCity={city} initialCategory={category} onSearch={handleSearch} />
 
       {/* Add Perplexity Real-time Service Results */}
-      <PerplexityServiceResults city={city} category={category !== "all" ? category : undefined} />
+      {/* <PerplexityServiceResults city={city} category={category !== "all" ? category : undefined} /> */}
 
       {isLoading ? (
         <div className="flex justify-center my-12">

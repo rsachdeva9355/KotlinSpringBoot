@@ -1,7 +1,10 @@
 import { Link } from "wouter";
 import { Facebook, Twitter, Instagram } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Footer() {
+  const { user, isLoading } = useAuth();
+
   return (
     <footer className="bg-gray-800 text-white py-8">
       <div className="container mx-auto px-4">
@@ -19,7 +22,9 @@ export default function Footer() {
               <li><Link href="/"><span className="hover:text-white cursor-pointer">Home</span></Link></li>
               <li><Link href="/services"><span className="hover:text-white cursor-pointer">Services Directory</span></Link></li>
               <li><Link href="/info"><span className="hover:text-white cursor-pointer">Pet Information Hub</span></Link></li>
-              <li><Link href="/pets"><span className="hover:text-white cursor-pointer">My Pets</span></Link></li>
+              {!isLoading && user && (
+                <li><Link href="/pets"><span className="hover:text-white cursor-pointer">My Pets</span></Link></li>
+              )}
             </ul>
           </div>
           

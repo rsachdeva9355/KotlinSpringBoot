@@ -5,6 +5,7 @@ import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertPetSchema, insertUserSchema } from "@shared/schema";
 import perplexityRoutes from "./routes/perplexity";
+import { perplexityClient } from "./utils/perplexityClient";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
@@ -126,9 +127,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "City parameter is required" });
       }
       
-      const services = await storage.getServiceProviders(
+      const services = await perplexityClient.getPetServicesForCity(
         city as string, 
-        category as string | undefined
+        category as string
       );
       
       res.json(services);
