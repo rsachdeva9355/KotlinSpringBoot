@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLocation("/");
       toast({
         title: "Registration successful!",
-        description: `Welcome to PetPals, ${userData.fullName}!`,
+        description: `Welcome to PawConnect, ${userData.fullName}!`,
       });
     },
     onError: (error: Error) => {

@@ -24,11 +24,9 @@ export default function HomePage() {
     <div className="min-h-screen">
       <HeroSection />
       <ValueProposition />
-      <Roadmap />
-      <SocialProof />
       <FeedbackSection />
       <FeatureVoting />
-      <CallToAction />
+      <Roadmap />
     </div>
   );
 }

@@ -9,7 +9,7 @@ export interface CityInfo {
 }
 
 // Use a hardcoded API URL for now
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3000';
 
 // Cache duration in milliseconds (24 hours)
 const CACHE_DURATION = 24 * 60 * 60 * 1000;

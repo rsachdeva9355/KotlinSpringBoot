@@ -93,7 +93,7 @@ export default function InfoHubPage() {
               Generated using advanced AI to provide comprehensive service information
             </p>
           </div>
-          <PerplexityServiceResults city={city || ""} category={selectedCategory} />
+          <PerplexityServiceResults city={city || "Amsterdam"} category={selectedCategory} />
         </div>
       )}
     </div>

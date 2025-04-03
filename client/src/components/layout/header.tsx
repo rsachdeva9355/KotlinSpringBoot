@@ -34,7 +34,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
             <Link href="/">
-              <span className="text-2xl font-bold">PetPal</span>
+              <span className="text-2xl font-bold">PawConnect</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-6">
               {publicNavItems.map((item) => (

@@ -95,7 +95,7 @@ export default function AuthPage() {
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
           {/* Hero Section */}
           <div className="md:w-1/2 bg-gradient-to-br from-primary to-primary-dark text-white p-8 flex flex-col justify-center">
-            <h1 className="font-poppins text-3xl font-bold mb-4">Welcome to PetPals</h1>
+            <h1 className="font-poppins text-3xl font-bold mb-4">Welcome to PawConnect</h1>
             <p className="mb-6">
               Connect with local pet services, manage your pet profiles, and discover pet-friendly resources in your city.
             </p>
