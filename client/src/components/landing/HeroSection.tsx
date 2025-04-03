@@ -42,8 +42,8 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: selectedCity ? `url(${heroImage})` : `url(/images/hero-bg.jpg)`, // Use first choice if city selected, otherwise fallback
-          filter: 'brightness(0.85)'
+          backgroundImage: `url('/pawcbackground.png')`,
+          filter: 'brightness(0.35)'
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/10" />
@@ -102,14 +102,6 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Button 
-            className="w-full sm:w-auto px-8 py-3 text-base font-semibold"
-            onClick={() => setLocation("/auth")}
-          >
-            Get Started
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-          
           <Button
             variant="outline"
             className="w-full sm:w-auto px-8 py-3 text-base font-semibold"
