@@ -1,21 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from "wouter";
 import { motion } from 'framer-motion';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-
-// Sample images for different cities - replace with actual images
-const cityImages = {
-  amsterdam: '/images/amsterdam-pets.jpg',
-  dublin: '/images/dublin-pets.jpg',
-  calgary: '/images/calgary-pets.jpg',
-  default: '/images/default-pets.jpg'
-};
+import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
-  const [_, setLocation] = useLocation();
   const [pawPositions, setPawPositions] = useState<{ x: number; y: number; rotation: number; scale: number; delay: number }[]>([]);
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
   
   // Generate random paw positions for the floating animation
   useEffect(() => {
@@ -30,11 +19,8 @@ const HeroSection = () => {
     setPawPositions(newPositions);
   }, []);
 
-  // Get the correct hero image based on selected city
-  const heroImage = selectedCity ? cityImages[selectedCity as keyof typeof cityImages] : cityImages.default;
-  
-  // Dynamic city name for the subheading
-  const cityName = selectedCity ? selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1) : 'your city';
+  // Default hero image
+  const heroImage = "https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80";
 
   return (
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero section">
@@ -42,13 +28,20 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: selectedCity ? `url(${heroImage})` : `url(/images/hero-bg.jpg)`, // Use first choice if city selected, otherwise fallback
+          backgroundImage: `url(${heroImage})`,
           filter: 'brightness(0.85)'
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30" />
       
-      {/* Floating Paw Prints */}
+      {/* Pet-themed decorative elements */}
+      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        <div className="absolute top-[20%] right-[5%] w-32 h-32 opacity-20 transform rotate-12 bg-white/20 rounded-full" />
+        <div className="absolute bottom-[15%] left-[8%] w-40 h-40 opacity-15 transform -rotate-6 bg-white/15 rounded-full" />
+        <div className="absolute top-[30%] left-[15%] w-16 h-16 opacity-20 transform rotate-45 bg-white/20 rounded-full" />
+      </div>
+      
+      {/* Floating Paw Prints - using a different icon (ChevronDown) as a substitute since Paw is not available */}
       {pawPositions.map((pos, index) => (
         <motion.div
           key={index}
@@ -84,7 +77,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          PawConnect: Your Local Pet Community
+          PawConnect: Your Local Pet Community, Connected
         </motion.h1>
         
         <motion.p 
@@ -93,7 +86,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Find local pet services, connect with nearby pet owners, and access {cityName}'s best pet resources in one place
+          Find local pet services, connect with nearby pet owners, and access your city's best pet resources in one place
         </motion.p>
         
         <motion.div
@@ -104,19 +97,18 @@ const HeroSection = () => {
         >
           <Button 
             className="w-full sm:w-auto px-8 py-3 text-base font-semibold"
-            onClick={() => setLocation("/register")}
+            size="lg"
           >
-            Get Started
-            <ChevronRight className="ml-2 h-4 w-4" />
+            Join the Waitlist
           </Button>
           
           <Button
             variant="outline"
-            className="w-full sm:w-auto px-8 py-3 text-base font-semibold"
-            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            className="w-full sm:w-auto border-white text-white hover:bg-white/20"
+            size="lg"
           >
             Learn More
-            <ChevronDown className="ml-2 h-4 w-4" />
+            <ChevronDown className="ml-2 w-5 h-5" />
           </Button>
         </motion.div>
       </div>
