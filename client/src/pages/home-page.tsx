@@ -6,7 +6,6 @@ import HeroSection from "@/components/landing/HeroSection";
 import ValueProposition from "@/components/landing/ValueProposition";
 import Roadmap from "@/components/landing/Roadmap";
 import FeedbackSection from "@/components/landing/FeedbackSection";
-import FeatureVoting from "@/components/landing/FeatureVoting";
 import CallToAction from "@/components/landing/CallToAction";
 
 export default function HomePage() {
@@ -27,7 +26,6 @@ export default function HomePage() {
         <ValueProposition />
         <Roadmap />
         <FeedbackSection />
-        <FeatureVoting />
         <CallToAction />
       </main>
     </div>

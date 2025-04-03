@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Lightbulb, Search, Dog, Cat, ThumbsUp, Heart, User, Calendar, Map, Star, Bell, MessageCircle, Zap } from 'lucide-react';
+import { Lightbulb, Search, ThumbsUp, Heart, User, Calendar, Map, Star, Bell, MessageCircle, Zap } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -195,13 +195,6 @@ const FeatureVoting = () => {
     return <IconComponent className={className} />;
   };
 
-  // Get random pet icon for decorative elements
-  const getRandomPetIcon = (size: number, className: string = "") => {
-    const icons = [Dog, Cat];
-    const RandomIcon = icons[Math.floor(Math.random() * icons.length)];
-    return <RandomIcon className={`w-${size} h-${size} ${className}`} />;
-  };
-
   // Categories for tabs
   const categories = [
     { id: 'all', name: 'All Features', icon: Star },
@@ -217,14 +210,6 @@ const FeatureVoting = () => {
 
   return (
     <section ref={ref} className="py-24 bg-muted/10 relative overflow-hidden" aria-labelledby="feature-voting-title" id="feature-voting">
-      {/* Decorative pet silhouettes */}
-      <div className="absolute top-0 right-0 opacity-5 transform rotate-12">
-        <Cat className="w-48 h-48" />
-      </div>
-      <div className="absolute bottom-0 left-0 opacity-5 transform -rotate-12">
-        <Dog className="w-56 h-56" />
-      </div>
-      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         <motion.div 
           className="text-center mb-12"
