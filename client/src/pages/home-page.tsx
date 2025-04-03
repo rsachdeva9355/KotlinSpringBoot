@@ -1,11 +1,14 @@
+import React from 'react';
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import Header from "@/components/landing/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import ValueProposition from "@/components/landing/ValueProposition";
 import Roadmap from "@/components/landing/Roadmap";
-import SocialProof from "@/components/landing/SocialProof";
+import FeatureVoting from "@/components/landing/FeatureVoting";
 import CallToAction from "@/components/landing/CallToAction";
+import Footer from "@/components/landing/Footer";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -19,12 +22,16 @@ export default function HomePage() {
   }, [user, setLocation]);
 
   return (
-    <div className="min-h-screen">
-      <HeroSection />
-      <ValueProposition />
-      <Roadmap />
-      <SocialProof />
-      <CallToAction />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="pt-16">
+        <HeroSection />
+        <ValueProposition />
+        <Roadmap />
+        <FeatureVoting />
+        <CallToAction />
+      </main>
+      <Footer />
     </div>
   );
 }
